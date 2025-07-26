@@ -60,9 +60,10 @@ export default function RedirectPage({
   return (
     <>
       <Head>
+        <title>{title}</title>
         <meta name="description" content={`Read more at ${redirectUrl}`} />
         <meta property="og:title" content={title} />
-        <meta property="og:description" content="Click to read more on this page." />
+        <meta name="description" content={`Read more at ${redirectUrl}`} />
         <meta property="og:url" content={redirectUrl} />
         <meta property="og:type" content="website" />
         {imageUrl && <meta property="og:image" content={imageUrl} />}
