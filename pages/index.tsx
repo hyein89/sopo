@@ -1,5 +1,6 @@
 import { GetServerSideProps } from "next";
 import Head from "next/head";
+import { useEffect } from "react";
 
 interface Props {
   url: string;
@@ -8,7 +9,6 @@ interface Props {
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const url = context.query.url as string;
 
-  // Kalau url tidak ada → tampilkan 404
   if (!url) {
     return {
       notFound: true,
@@ -21,35 +21,61 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 };
 
 export default function RedirectPage({ url }: Props) {
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      window.location.href = url;
+    }, 2500); // 2.5 detik loading sebelum redirect
+    return () => clearTimeout(timer);
+  }, [url]);
+
   return (
     <>
       <Head>
-        <title>Redirecting to {url}</title>
-        <meta name="description" content={`You will be redirected to ${url}`} />
-        <meta property="og:title" content="Cek link ini" />
-        <meta property="og:description" content={`Link ini akan membawa kamu ke: ${url}`} />
+        <title>Mengarahkan...</title>
+        <meta name="description" content={`Anda akan diarahkan ke ${url}`} />
+        <meta property="og:title" content="Membuka link..." />
+        <meta property="og:description" content={`Menuju ${url}`} />
         <meta property="og:image" content="https://via.placeholder.com/800x420?text=Redirecting" />
         <meta property="og:url" content={url} />
-        {/* Tidak auto-redirect! */}
       </Head>
-      <main style={{ padding: "2rem", textAlign: "center" }}>
-        <h1>🔗 Anda akan diarahkan ke:</h1>
-        <p style={{ fontSize: "1.2rem", color: "#555" }}>{url}</p>
-        <a
-          href={url}
-          style={{
-            marginTop: "2rem",
-            display: "inline-block",
-            padding: "12px 20px",
-            background: "#0070f3",
-            color: "#fff",
-            borderRadius: "5px",
-            textDecoration: "none",
-          }}
-        >
-          Klik untuk lanjut
-        </a>
+      <main style={styles.container}>
+        <div style={styles.loader}></div>
+        <p style={{ marginTop: 20, color: "#555", fontSize: "1.1rem" }}>
+          Mengarahkan ke <br />
+          <code>{url}</code>
+        </p>
       </main>
     </>
   );
+}
+
+const styles: { [key: string]: React.CSSProperties } = {
+  container: {
+    height: "100vh",
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#f9f9f9",
+  },
+  loader: {
+    width: 80,
+    height: 80,
+    border: "8px solid #eee",
+    borderTop: "8px solid #0070f3",
+    borderRadius: "50%",
+    animation: "spin 1s linear infinite",
+  },
+};
+
+// Inject CSS animation (karena tidak pakai CSS file)
+if (typeof window !== "undefined") {
+  const style = document.createElement("style");
+  style.innerHTML = `
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  `;
+  document.head.appendChild(style);
 }
