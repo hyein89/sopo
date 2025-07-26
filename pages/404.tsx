@@ -4,16 +4,45 @@ export default function Custom404() {
   return (
     <>
       <Head>
-        <title>404 - Halaman Tidak Ditemukan</title>
+        <title>404 - Page Not Found</title>
       </Head>
       <div style={styles.container}>
         <div style={styles.card}>
           <h1 style={styles.title}>🚫 404</h1>
-          <p style={styles.message}>
-            URL tujuan tidak ditemukan. Mohon sertakan parameter <code style={styles.code}>?url=</code>.
-          </p>
-          <a href="/" style={styles.button}>Kembali ke Beranda</a>
+          <p style={styles.message}>Sorry, the page you’re looking for doesn’t exist.</p>
+          <a href="/" style={styles.button}>Back to Home</a>
         </div>
+
+        <style jsx global>{`
+          body {
+            margin: 0;
+            padding: 0;
+            background: #f4f4f7;
+            color: #2f3542;
+            font-family: 'Segoe UI', sans-serif;
+          }
+
+          @media (prefers-color-scheme: dark) {
+            body {
+              background: #1e1e1e;
+              color: #ffffff;
+            }
+
+            .card {
+              background: #2a2a2a !important;
+              box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6) !important;
+            }
+
+            .button {
+              background: #0a84ff !important;
+            }
+
+            code {
+              background: #333 !important;
+              color: #fff !important;
+            }
+          }
+        `}</style>
       </div>
     </>
   );
@@ -22,13 +51,10 @@ export default function Custom404() {
 const styles: { [key: string]: React.CSSProperties } = {
   container: {
     height: "100vh",
-    margin: 0,
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    background: "linear-gradient(135deg, #f4f4f7, #dfe4ea)",
-    fontFamily: "'Segoe UI', sans-serif",
-    color: "#2f3542",
+    padding: "2rem",
   },
   card: {
     background: "#ffffff",
@@ -36,6 +62,7 @@ const styles: { [key: string]: React.CSSProperties } = {
     borderRadius: "12px",
     boxShadow: "0 8px 24px rgba(0,0,0,0.1)",
     maxWidth: "420px",
+    width: "100%",
     textAlign: "center",
   },
   title: {
@@ -46,12 +73,6 @@ const styles: { [key: string]: React.CSSProperties } = {
     fontSize: "1.1rem",
     marginBottom: "2rem",
     lineHeight: 1.5,
-  },
-  code: {
-    background: "#f1f2f6",
-    padding: "0.2rem 0.5rem",
-    borderRadius: "6px",
-    fontFamily: "monospace",
   },
   button: {
     display: "inline-block",
