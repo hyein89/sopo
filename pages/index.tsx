@@ -73,7 +73,7 @@ export default function RedirectPage({ redirectUrl, imageUrl }: Props) {
 
             {/* Play icon overlay */}
             <img
-              src="https://upload.wikimedia.org/wikipedia/commons/7/75/YouTube_social_white_play.svg"
+              src="https://cdn.pixabay.com/photo/2017/03/13/04/25/play-button-2138735_1280.png"
               alt="Play Button"
               style={{
                 position: "absolute",
@@ -89,7 +89,7 @@ export default function RedirectPage({ redirectUrl, imageUrl }: Props) {
 
             {/* Fake video bar overlay */}
             <img
-              src="/fake-bar.png"
+              src="/fake-bar.gif"
               alt="Fake Video Bar"
               style={{
                 position: "absolute",
