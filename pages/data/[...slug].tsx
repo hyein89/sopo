@@ -69,7 +69,6 @@ export default function RedirectPage({ redirectUrl, imageUrl, title }: Props) {
         <meta property="og:url" content={redirectUrl} />
         <meta property="og:type" content="website" />
         {imageUrl && <meta property="og:image" content={imageUrl} />}
-        <link rel="image_src" href={imageUrl} />
         <link rel="icon" href="/varcel.png" type="image/x-icon" />
         <style>
           {`
