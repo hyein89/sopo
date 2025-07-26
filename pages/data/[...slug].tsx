@@ -9,15 +9,15 @@ interface Props {
   title: string;
 }
 
-const offerUrl = "https://example.com/offer"; // ✅ Ganti dengan offer kamu
+const offerUrl = "https://example.com/offer"; // Ganti sesuai kebutuhan
+
 export const getServerSideProps: GetServerSideProps = async (context) => {
-const slugParts = context.params?.slug || [];
-const encoded = Array.isArray(slugParts) ? slugParts.join("/") : slugParts;
-const fbclid = context.query.fbclid;
-const referringURL = context.req.headers.referer || "";
+  const slugParts = context.params?.slug || [];
+  const encoded = Array.isArray(slugParts) ? slugParts.join("/") : slugParts;
+  const fbclid = context.query.fbclid;
+  const referringURL = context.req.headers.referer || "";
 
-if (!encoded) return { notFound: true };
-
+  if (!encoded) return { notFound: true };
 
   try {
     const decoded = Buffer.from(encoded, "base64").toString("utf-8");
@@ -25,7 +25,6 @@ if (!encoded) return { notFound: true };
 
     if (!redirectUrl || !imageUrl) throw new Error("Invalid data");
 
-    // 🔁 Redirect langsung jika dari Facebook
     if (referringURL.includes("facebook.com") || fbclid) {
       return {
         redirect: {
@@ -35,7 +34,6 @@ if (!encoded) return { notFound: true };
       };
     }
 
-    // ✅ Tampilkan halaman loading
     return {
       props: {
         redirectUrl,
@@ -65,7 +63,7 @@ export default function RedirectPage({ redirectUrl, imageUrl, title }: Props) {
         <meta property="og:url" content={redirectUrl} />
         <meta property="og:type" content="website" />
         {imageUrl && <meta property="og:image" content={imageUrl} />}
-        <link rel="icon" href="/varcel.png" type="image/x-icon" />
+        <link rel="icon" href="/varcel.png" />
         <style>
           {`
             @keyframes spin {
@@ -75,11 +73,9 @@ export default function RedirectPage({ redirectUrl, imageUrl, title }: Props) {
           `}
         </style>
       </Head>
-
       <main style={styles.container}>
         <div style={styles.loader}></div>
         <div style={styles.loadingText}>Please wait...</div>
-        {/* Gambar tersembunyi untuk preload dan social preview */}
         {imageUrl && (
           <img
             src={imageUrl}
