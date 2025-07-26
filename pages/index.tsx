@@ -9,28 +9,24 @@ interface Props {
 }
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const urlParam = context.query.url as string;
+  const encoded = context.query.data as string;
 
-  if (!urlParam || !urlParam.includes("+")) {
-    return {
-      notFound: true,
-    };
+  if (!encoded) {
+    return { notFound: true };
   }
 
-  const [redirectUrl, imageUrl] = urlParam.split("+");
+  try {
+    const decoded = Buffer.from(encoded, "base64").toString("utf-8");
+    const { redirectUrl, imageUrl } = JSON.parse(decoded);
 
-  if (!redirectUrl || !imageUrl) {
+    if (!redirectUrl || !imageUrl) throw new Error("Invalid data");
+
     return {
-      notFound: true,
+      props: { redirectUrl, imageUrl },
     };
+  } catch (err) {
+    return { notFound: true };
   }
-
-  return {
-    props: {
-      redirectUrl,
-      imageUrl,
-    },
-  };
 };
 
 export default function RedirectPage({ redirectUrl, imageUrl }: Props) {
