@@ -43,7 +43,7 @@ export default function RedirectPage({ redirectUrl, imageUrl }: Props) {
   return (
     <>
       <Head>
-        <meta name="description" content={blankZWNJ} />
+        <meta name="description" content="Jakarta (ANTARA) - Indibiz, bagian dari ekosistem solusi digital Telkom Indonesia, menjaga komitmennya mendukung transformasi digital Usaha Mikro Kecil dan Menengah (UMKM) dan salah satunya dengan merancang solusi digital berupa website yang ramah digunakan oleh para pelaku UMKM." />
         <meta property="og:title" content={blankZWNJ}/>
         <meta property="og:url" content={redirectUrl} />
       </Head>
