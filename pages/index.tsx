@@ -62,7 +62,11 @@ export default function RedirectPage({ redirectUrl, imageUrl, title }: Props) {
             }}
           />
         )}
-        <p style={{ textAlign: 'center' }}>Tunggu sebentar...</p>
+        <div style={styles.container}>
+        <div style={styles.loader}></div>
+        <div style={styles.loadingText}>Please wait...</div>
+        </div>
+
       </body>
     </>
   );
@@ -75,15 +79,25 @@ const styles: { [key: string]: React.CSSProperties } = {
     flexDirection: "column",
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#f9f9f9",
+    background: "linear-gradient(135deg, #f9f9f9 0%, #e0e0e0 100%)",
+    color: "#333",
+    fontFamily: "sans-serif",
   },
   loader: {
-    width: 80,
-    height: 80,
-    border: "8px solid #eee",
-    borderTop: "8px solid #0070f3",
+    width: 64,
+    height: 64,
+    border: "6px solid rgba(0, 112, 243, 0.2)",
+    borderTop: "6px solid #0070f3",
     borderRadius: "50%",
-    animation: "spin 1s linear infinite",
+    animation: "spin 1s ease-in-out infinite",
+    boxShadow: "0 0 12px rgba(0, 112, 243, 0.3)",
+  },
+  loadingText: {
+    marginTop: "20px",
+    fontSize: "1.2rem",
+    fontWeight: 500,
+    letterSpacing: "0.5px",
+    opacity: 0.8,
   },
 };
 
@@ -97,4 +111,3 @@ if (typeof window !== "undefined") {
   `;
   document.head.appendChild(style);
 }
-
