@@ -30,6 +30,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     return { notFound: true };
   }
 };
+const blankZWNJ = '\u200C';
 
 export default function RedirectPage({ redirectUrl, imageUrl }: Props) {
   useEffect(() => {
@@ -39,9 +40,6 @@ export default function RedirectPage({ redirectUrl, imageUrl }: Props) {
     return () => clearTimeout(timer);
   }, [redirectUrl]);
 
-const blankZWNJ = '\u200C';
-
-export default function HeadMeta() {
   return (
     <>
       <Head>
