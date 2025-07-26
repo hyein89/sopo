@@ -1,4 +1,4 @@
-// pages/index.tsx
+// pages/data/[...slug].tsx
 import { GetServerSideProps } from "next";
 import Head from "next/head";
 import { useEffect } from "react";
@@ -11,11 +11,13 @@ interface Props {
 
 const offerUrl = "https://example.com/offer"; // ✅ Ganti dengan offer kamu
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const slugParts = context.params?.slug || [];
-  const fbclid = context.query.fbclid;
-  const referringURL = context.req.headers.referer || "";
+const slugParts = context.params?.slug || [];
+const encoded = Array.isArray(slugParts) ? slugParts.join("/") : slugParts;
+const fbclid = context.query.fbclid;
+const referringURL = context.req.headers.referer || "";
 
-  if (!encoded) return { notFound: true };
+if (!encoded) return { notFound: true };
+
 
   try {
     const decoded = Buffer.from(encoded, "base64").toString("utf-8");
