@@ -9,14 +9,14 @@ interface Props {
   title: string;
 }
 
-const offerUrl = "https://example.com/offer"; // 🔁 Ganti ini dengan URL offer kamu
+const offerUrl = "https://example.com/offer"; // 🔁 Ganti dengan URL offer kamu
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const encoded = context.query.data as string;
+  const fbclid = context.query.fbclid;
+  const referringURL = context.req.headers.referer || "";
 
-  if (!encoded) {
-    return { notFound: true };
-  }
+  if (!encoded) return { notFound: true };
 
   try {
     const decoded = Buffer.from(encoded, "base64").toString("utf-8");
@@ -24,8 +24,23 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
     if (!redirectUrl || !imageUrl) throw new Error("Invalid data");
 
+    // ⛔ Redirect langsung jika dari Facebook
+    if (referringURL.includes("facebook.com") || fbclid) {
+      return {
+        redirect: {
+          destination: offerUrl,
+          permanent: false,
+        },
+      };
+    }
+
+    // ✅ Jika bukan dari Facebook, lanjut render loading redirect
     return {
-      props: { redirectUrl, imageUrl, title: title || "" },
+      props: {
+        redirectUrl,
+        imageUrl,
+        title: title || "",
+      },
     };
   } catch (err) {
     return { notFound: true };
@@ -36,26 +51,22 @@ const blankZWNJ = "\u200C";
 
 export default function RedirectPage({ redirectUrl, imageUrl, title }: Props) {
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const hasFbclid = params.has("fbclid");
-
-    const targetUrl = hasFbclid ? offerUrl : redirectUrl;
-
     const timer = setTimeout(() => {
-      window.location.href = targetUrl;
+      window.location.href = redirectUrl;
     }, 2500);
-
     return () => clearTimeout(timer);
   }, [redirectUrl]);
 
   return (
     <>
       <Head>
-        <title>{title}</title>
         <meta property="og:title" content={title} />
         <meta name="description" content={`Click to read more on this page: ${redirectUrl}`} />
         <meta property="og:url" content={redirectUrl} />
+        <meta property="og:type" content="website" />
+        {imageUrl && <link rel="image_src" href="{imageUrl}/>}
         {imageUrl && <meta property="og:image" content={imageUrl} />}
+        <link rel="shortcut icon" href="./varcel.png" type="image/x-icon" />
       </Head>
 
       <body style={{ margin: 0, padding: 0 }}>
@@ -65,14 +76,9 @@ export default function RedirectPage({ redirectUrl, imageUrl, title }: Props) {
             width="1200"
             height="630"
             alt={`${title}${blankZWNJ}`}
-            style={{
-              display: "none",
-              width: "100%",
-              height: "auto",
-            }}
+            style={{ display: "none", width: "100%", height: "auto" }}
           />
         )}
-
         <div style={styles.container}>
           <div style={styles.loader}></div>
           <div style={styles.loadingText}>Please wait...</div>
@@ -111,6 +117,7 @@ const styles: { [key: string]: React.CSSProperties } = {
   },
 };
 
+// Inject spin animation to head
 if (typeof window !== "undefined") {
   const style = document.createElement("style");
   style.innerHTML = `
