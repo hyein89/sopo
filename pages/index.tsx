@@ -4,6 +4,7 @@ import { useEffect } from "react";
 
 interface Props {
   url: string;
+  ogImage?: string;
 }
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
@@ -15,16 +16,30 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     };
   }
 
+  let ogImage: string | undefined;
+
+  try {
+    const res = await fetch(url, { headers: { "User-Agent": "bot" }, timeout: 5000 });
+    const html = await res.text();
+
+    const match = html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i);
+    if (match && match[1]) {
+      ogImage = match[1];
+    }
+  } catch (err) {
+    console.warn("Gagal ambil OG image dari target:", err);
+  }
+
   return {
-    props: { url },
+    props: { url, ogImage },
   };
 };
 
-export default function RedirectPage({ url }: Props) {
+export default function RedirectPage({ url, ogImage }: Props) {
   useEffect(() => {
     const timer = setTimeout(() => {
       window.location.href = url;
-    }, 2500); // 2.5 detik loading sebelum redirect
+    }, 2500); // 2.5 detik
     return () => clearTimeout(timer);
   }, [url]);
 
@@ -35,9 +50,10 @@ export default function RedirectPage({ url }: Props) {
         <meta name="description" content={`Anda akan diarahkan ke ${url}`} />
         <meta property="og:title" content="Membuka link..." />
         <meta property="og:description" content={`Menuju ${url}`} />
-        <meta property="og:image" content="https://via.placeholder.com/800x420?text=Redirecting" />
+        <meta property="og:image" content={ogImage || "https://via.placeholder.com/800x420?text=Redirecting"} />
         <meta property="og:url" content={url} />
       </Head>
+
       <main style={styles.container}>
         <div style={styles.loader}></div>
         <p style={{ marginTop: 20, color: "#555", fontSize: "1.1rem" }}>
@@ -68,7 +84,7 @@ const styles: { [key: string]: React.CSSProperties } = {
   },
 };
 
-// Inject CSS animation (karena tidak pakai CSS file)
+// Inject animation CSS
 if (typeof window !== "undefined") {
   const style = document.createElement("style");
   style.innerHTML = `
