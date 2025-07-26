@@ -63,11 +63,9 @@ export default function RedirectPage({
         <title>{title}</title>
         <meta name="description" content={`Read more at ${redirectUrl}`} />
         <meta property="og:title" content={title} />
-        <meta property="og:description" content="Click to read more on this page." />
         <meta property="og:url" content={redirectUrl} />
         <meta property="og:type" content="website" />
         {imageUrl && <meta property="og:image" content={imageUrl} />}
-        <link rel="image_src" href={imageUrl} />
         <link rel="icon" href="/varcel.png" type="image/x-icon" />
         <style>{`
           @keyframes spin {
