@@ -3,6 +3,8 @@ import { GetServerSideProps } from "next";
 import Head from "next/head";
 import { useEffect } from "react";
 
+
+
 interface Props {
   redirectUrl: string;
   imageUrl: string;
@@ -37,11 +39,14 @@ export default function RedirectPage({ redirectUrl, imageUrl }: Props) {
     return () => clearTimeout(timer);
   }, [redirectUrl]);
 
+const blankZWNJ = '\u200C';
+
+export default function HeadMeta() {
   return (
     <>
       <Head>
-        <meta name="description" content="ㅤ" />
-        <meta property="og:title" content="ㅤ" />
+        <meta name="description" content={blankZWNJ} />
+        <meta property="og:title" content={blankZWNJ}/>
         <meta property="og:image" content={imageUrl} />
         <meta property="og:url" content={redirectUrl} />
       </Head>
