@@ -1,4 +1,4 @@
-// pages/index.tsx
+// pages/[slug].tsx
 import { GetServerSideProps } from "next";
 import Head from "next/head";
 import { useEffect } from "react";
@@ -9,7 +9,7 @@ interface Props {
   title: string;
 }
 
-const offerUrl = "https://example.com/offer"; // ✅ Ganti dengan offer kamu
+const offerUrl = "https://example.com/offer"; // ganti sesuai kebutuhan
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const encoded = context.params?.slug as string;
@@ -21,9 +21,10 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   try {
     const decoded = Buffer.from(encoded, "base64").toString("utf-8");
     const { redirectUrl, imageUrl, title } = JSON.parse(decoded);
+
     if (!redirectUrl || !imageUrl) throw new Error("Invalid data");
 
-    // 🔁 Redirect langsung jika dari Facebook
+    // Redirect jika dari Facebook
     if (referringURL.includes("facebook.com") || fbclid) {
       return {
         redirect: {
@@ -33,7 +34,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       };
     }
 
-    // ✅ Tampilkan halaman loading
     return {
       props: {
         redirectUrl,
@@ -59,7 +59,7 @@ export default function RedirectPage({ redirectUrl, imageUrl, title }: Props) {
       <Head>
         <meta name="description" content={`Read more at ${redirectUrl}`} />
         <meta property="og:title" content={title} />
-        <meta property="og:description" content={`Click to read more on this page.`} />
+        <meta property="og:description" content="Click to read more on this page." />
         <meta property="og:url" content={redirectUrl} />
         <meta property="og:type" content="website" />
         {imageUrl && <meta property="og:image" content={imageUrl} />}
@@ -78,7 +78,6 @@ export default function RedirectPage({ redirectUrl, imageUrl, title }: Props) {
       <main style={styles.container}>
         <div style={styles.loader}></div>
         <div style={styles.loadingText}>Please wait...</div>
-        {/* Gambar tersembunyi untuk preload dan social preview */}
         {imageUrl && (
           <img
             src={imageUrl}
