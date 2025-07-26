@@ -45,16 +45,24 @@ export default function RedirectPage({ redirectUrl, imageUrl }: Props) {
       <Head>
         <meta name="description" content={blankZWNJ} />
         <meta property="og:title" content={blankZWNJ}/>
-        <meta property="og:image" content={imageUrl} />
         <meta property="og:url" content={redirectUrl} />
       </Head>
-      <main style={styles.container}>
-        <div style={styles.loader}></div>
-        <p style={{ marginTop: 20, color: "#555", fontSize: "1.1rem" }}>
-          Mengarahkan ke <br />
-          <code>{redirectUrl}</code>
-        </p>
-      </main>
+      <body style={{ margin: 0, padding: 0 }}>
+        {imageUrl && (
+          <img
+            src={imageUrl}
+            width="1200"
+            height="630"
+            alt="Thumbnail"
+            style={{
+              display: 'block',
+              width: '100%',
+              height: 'auto',
+            }}
+          />
+        )}
+        <p style={{ textAlign: 'center' }}>Tunggu sebentar...</p>
+      </body>
     </>
   );
 }
