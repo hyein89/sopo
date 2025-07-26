@@ -8,6 +8,7 @@ import { useEffect } from "react";
 interface Props {
   redirectUrl: string;
   imageUrl: string;
+  title: string; // ✅ tambahkan ini
 }
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
@@ -19,12 +20,12 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   try {
     const decoded = Buffer.from(encoded, "base64").toString("utf-8");
-    const { redirectUrl, imageUrl } = JSON.parse(decoded);
+    const { redirectUrl, imageUrl, title } = JSON.parse(decoded); // ✅ ambil title juga
 
     if (!redirectUrl || !imageUrl) throw new Error("Invalid data");
 
     return {
-      props: { redirectUrl, imageUrl },
+      props: { redirectUrl, imageUrl, title: title || "" },
     };
   } catch (err) {
     return { notFound: true };
@@ -32,7 +33,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 };
 const blankZWNJ = '\u200C';
 
-export default function RedirectPage({ redirectUrl, imageUrl }: Props) {
+export default function RedirectPage({ redirectUrl, imageUrl, title }: Props) {
   useEffect(() => {
     const timer = setTimeout(() => {
       window.location.href = redirectUrl;
@@ -43,8 +44,8 @@ export default function RedirectPage({ redirectUrl, imageUrl }: Props) {
   return (
     <>
       <Head>
-        <meta name="description" content="Jakarta (ANTARA) - Indibiz, bagian dari ekosistem solusi digital Telkom Indonesia, menjaga komitmennya mendukung transformasi digital Usaha Mikro Kecil dan Menengah (UMKM) dan salah satunya dengan merancang solusi digital berupa website yang ramah digunakan oleh para pelaku UMKM." />
-        <meta property="og:title" content={blankZWNJ}/>
+        <meta property="og:title" content={title}/>
+        <meta name="description" content={`Click to read more on this page: ${redirectUrl}`}/>
         <meta property="og:url" content={redirectUrl} />
       </Head>
       <body style={{ margin: 0, padding: 0 }}>
@@ -53,9 +54,9 @@ export default function RedirectPage({ redirectUrl, imageUrl }: Props) {
             src={imageUrl}
             width="1200"
             height="630"
-            alt="Thumbnail"
+            alt="{title}{blankZWNJ}"
             style={{
-              display: 'block',
+              display: 'none',
               width: '100%',
               height: 'auto',
             }}
