@@ -12,7 +12,9 @@ interface Props {
 const offerUrl = "https://example.com/offer"; // ganti sesuai kebutuhan
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const encoded = context.params?.slug as string;
+  const slugParts = context.params?.slug || [];
+  const encoded = Array.isArray(slugParts) ? slugParts.join("/") : slugParts;
+
   const fbclid = context.query.fbclid;
   const referringURL = context.req.headers.referer || "";
 
@@ -24,7 +26,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
     if (!redirectUrl || !imageUrl) throw new Error("Invalid data");
 
-    // Redirect jika dari Facebook
     if (referringURL.includes("facebook.com") || fbclid) {
       return {
         redirect: {
@@ -45,6 +46,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     return { notFound: true };
   }
 };
+
 
 export default function RedirectPage({ redirectUrl, imageUrl, title }: Props) {
   useEffect(() => {
