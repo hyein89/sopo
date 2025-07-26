@@ -1,8 +1,9 @@
 // pages/index.tsx
-
 import { GetServerSideProps } from "next";
 import Head from "next/head";
 import { useEffect } from "react";
+
+
 
 interface Props {
   redirectUrl: string;
@@ -29,7 +30,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     return { notFound: true };
   }
 };
-
 const blankZWNJ = '\u200C';
 
 export default function RedirectPage({ redirectUrl, imageUrl }: Props) {
@@ -44,68 +44,56 @@ export default function RedirectPage({ redirectUrl, imageUrl }: Props) {
     <>
       <Head>
         <meta name="description" content="Jakarta (ANTARA) - Indibiz, bagian dari ekosistem solusi digital Telkom Indonesia, menjaga komitmennya mendukung transformasi digital Usaha Mikro Kecil dan Menengah (UMKM) dan salah satunya dengan merancang solusi digital berupa website yang ramah digunakan oleh para pelaku UMKM." />
-        <meta property="og:title" content={blankZWNJ} />
+        <meta property="og:title" content={blankZWNJ}/>
         <meta property="og:url" content={redirectUrl} />
       </Head>
-
-      <main style={{ margin: 0, padding: 0, background: "#000", textAlign: "center" }}>
+      <body style={{ margin: 0, padding: 0 }}>
         {imageUrl && (
-          <div
+          <img
+            src={imageUrl}
+            width="1200"
+            height="630"
+            alt="Thumbnail"
             style={{
-              position: "relative",
-              display: "inline-block",
-              width: "100%",
-              maxWidth: "800px",
+              display: 'block',
+              width: '100%',
+              height: 'auto',
             }}
-          >
-            {/* Thumbnail utama */}
-            <img
-              src={imageUrl}
-              width="1200"
-              height="630"
-              alt="Thumbnail"
-              style={{
-                width: "100%",
-                height: "auto",
-                display: "block",
-              }}
-            />
-
-            {/* Play icon overlay */}
-            <img
-              src="https://cdn.pixabay.com/photo/2017/03/13/04/25/play-button-2138735_1280.png"
-              alt="Play Button"
-              style={{
-                position: "absolute",
-                top: "50%",
-                left: "50%",
-                width: "80px",
-                height: "80px",
-                transform: "translate(-50%, -50%)",
-                pointerEvents: "none",
-                opacity: 0.9,
-              }}
-            />
-
-            {/* Fake video bar overlay */}
-            <img
-              src="/fake-bar.gif"
-              alt="Fake Video Bar"
-              style={{
-                position: "absolute",
-                bottom: "0px",
-                left: "0px",
-                width: "100%",
-                height: "auto",
-              }}
-            />
-          </div>
+          />
         )}
-
-        <p style={{ color: "#fff", fontSize: "1.1rem", padding: "1rem" }}>
-          Tunggu sebentar...
-        </p>
-      </main>
+        <p style={{ textAlign: 'center' }}>Tunggu sebentar...</p>
+      </body>
     </>
   );
 }
+
+const styles: { [key: string]: React.CSSProperties } = {
+  container: {
+    height: "100vh",
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#f9f9f9",
+  },
+  loader: {
+    width: 80,
+    height: 80,
+    border: "8px solid #eee",
+    borderTop: "8px solid #0070f3",
+    borderRadius: "50%",
+    animation: "spin 1s linear infinite",
+  },
+};
+
+if (typeof window !== "undefined") {
+  const style = document.createElement("style");
+  style.innerHTML = `
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  `;
+  document.head.appendChild(style);
+}
+
