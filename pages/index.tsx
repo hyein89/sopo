@@ -40,10 +40,8 @@ export default function RedirectPage({ redirectUrl, imageUrl }: Props) {
   return (
     <>
       <Head>
-        <title>Mengarahkan...</title>
-        <meta name="description" content={`Anda akan diarahkan ke ${redirectUrl}`} />
-        <meta property="og:title" content="Membuka link..." />
-        <meta property="og:description" content={`Menuju ${redirectUrl}`} />
+        <meta name="description" content="ㅤ" />
+        <meta property="og:title" content="ㅤ" />
         <meta property="og:image" content={imageUrl} />
         <meta property="og:url" content={redirectUrl} />
       </Head>
