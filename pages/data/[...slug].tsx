@@ -53,27 +53,12 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 };
 
 export default function RedirectPage({ redirectUrl, imageUrl, title }: Props) {
-useEffect(() => {
-  // Redirect otomatis setelah 2.5 detik
-  const timer = setTimeout(() => {
-    // Ganti riwayat agar tombol "Back" tidak kembali ke halaman ini
-    window.history.replaceState(null, "", "/__redirected__");
-    window.location.href = redirectUrl;
-  }, 2500);
-
-  // Jika user klik tombol "Back", arahkan ke offerUrl
-  const onPopState = () => {
-    window.location.href = offerUrl;
-  };
-
-  window.addEventListener("popstate", onPopState);
-
-  return () => {
-    clearTimeout(timer);
-    window.removeEventListener("popstate", onPopState);
-  };
-}, [redirectUrl]);
-
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      window.location.href = redirectUrl;
+    }, 2500);
+    return () => clearTimeout(timer);
+  }, [redirectUrl]);
 
   return (
     <>
