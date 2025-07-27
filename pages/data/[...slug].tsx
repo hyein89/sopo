@@ -1,4 +1,4 @@
-// pages/data/[...slug].tsx
+// pages/data/[...slug].tsx 
 import { GetServerSideProps } from "next";
 import Head from "next/head";
 import { useEffect } from "react";
