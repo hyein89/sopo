@@ -44,7 +44,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       props: {
         redirectUrl,
         imageUrl,
-        title: title || "Redirecting...",
+        title: title || "⠀
+",
       },
     };
   } catch (err) {
