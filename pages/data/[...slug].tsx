@@ -63,9 +63,8 @@ export default function RedirectPage({ redirectUrl, imageUrl, title }: Props) {
   return (
     <>
       <Head>
-        <title>{title}</title>
-        <meta name="description" content={`Read more at ${redirectUrl}`} />
-        <meta property="og:title" content={title} />
+        <meta property="og:title" content="⠀
+" />
         <meta property="og:url" content={redirectUrl} />
         <meta property="og:type" content="website" />
         <link rel="icon" href="/varcel.png" type="image/x-icon" />
