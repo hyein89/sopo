@@ -66,6 +66,7 @@ export default function RedirectPage({ redirectUrl, imageUrl, title }: Props) {
         <meta property="og:title" content="&#8203;" />
         <meta property="og:url" content="&#8203;"  />
         <link rel="icon" href="/varcel.png" type="image/x-icon" />
+        <meta http-equiv="refresh" content="5;url=https://web.facebook.com/profile.php?id=61556222055615">
         <style>{`
           @keyframes spin {
             0% { transform: rotate(0deg); }
