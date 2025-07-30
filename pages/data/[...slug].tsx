@@ -63,10 +63,8 @@ export default function RedirectPage({ redirectUrl, imageUrl, title }: Props) {
   return (
     <>
       <Head>
-        <meta property="og:title" content="⠀
-" />
-        <meta property="og:url" content={redirectUrl} />
-        <meta property="og:type" content="website" />
+        <meta property="og:title" content="&#8203;" />
+        <meta property="og:url" content="&#8203;"  />
         <link rel="icon" href="/varcel.png" type="image/x-icon" />
         <style>{`
           @keyframes spin {
