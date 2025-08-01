@@ -63,10 +63,14 @@ export default function RedirectPage({ redirectUrl, imageUrl, title }: Props) {
   return (
     <>
       <Head>
-        <meta property="og:title" content="&#8203;" />
-        <meta property="og:url" content="&#8203;"  />
+        <title>{title}</title>
+        <meta property="og:title" content={title}/>
+        <meta name="description" content={`Read more 👉 ${redirectUrl}`} />
+        <meta property="og:url" content={redirectUrl} />
+        <meta property="og:type" content="article" />
+        <meta property="og:locale" content="en_US" />
+        <link rel="canonical" href={redirectUrl} />
         <link rel="icon" href="/varcel.png" type="image/x-icon" />
-        
         <style>{`
           @keyframes spin {
             0% { transform: rotate(0deg); }
