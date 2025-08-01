@@ -10,7 +10,7 @@ interface Props {
 }
 
 // Ganti ini dengan link tujuan jika user datang dari Facebook
-const offerUrl = "https://priesthardshipwillow.com/q3sc09250?key=d2f645145443ac96251458e6cadaac1b";
+const offerUrl = "https://shorturl.at/Rb5nA";
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const slugParts = context.params?.slug || [];
