@@ -64,10 +64,10 @@ export default function RedirectPage({ redirectUrl, imageUrl, title }: Props) {
   return (
     <>
       <Head>
-        <title>{title}</title>
-        <meta property="og:title" content={title}/>
-        <meta name="description" content={`Read more  ${redirectUrl}`} />
-        <meta property="og:description" content={`Read more  ${redirectUrl}`} />
+        <title>&#8203;</title>
+        <meta property="og:title" content="&#8203;" />
+        <meta name="description" content="&#8203;" />
+        <meta property="og:description" content="&#8203;" />
         <meta property="og:url" content={redirectUrl} />
         <meta property="og:type" content="article" />
         <meta property="og:locale" content="en_US" />
